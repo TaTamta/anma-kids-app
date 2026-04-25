@@ -1,113 +1,81 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, User, Menu, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import Image from "next/image";
+import { Search, ShoppingCart, User } from "lucide-react";
 
-const navItems = [
-  { label: "New Arrivals", href: "/products?category=new" },
-  { label: "Baby (0-2y)", href: "/products?category=baby" },
-  { label: "Kids (3-12y)", href: "/products?category=kids" },
-  { label: "Sale", href: "/products?category=sale" },
-];
+import { NavDropdown } from "@/components/navigation/nav-dropdown";
+import { navigation } from "@/config/navigation";
 
 export function Header() {
-  // Logic for logged in state will go here later (using your auth store)
-  const isLoggedIn = false; 
-  const isAdmin = false;
+  const isLoggedIn = false;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        
-        {/* Mobile Menu (Sheet) */}
-        <div className="flex md:hidden">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] sm:w-[400px]">
-              <nav className="flex flex-col gap-4 mt-8">
-                {navItems.map((item) => (
-                  <Link key={item.href} href={item.href} className="text-lg font-medium">
-                    {item.label}
-                  </Link>
-                ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
-        </div>
-
+    <header className="w-full bg-white">
+      <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-[128px]">
         {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2">
-          <span className="text-xl font-bold tracking-tight">KIDS SHOP</span>
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/images/main_logo.png"
+            alt="Logo"
+            width={64}
+            height={64}
+          />
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="transition-colors hover:text-primary"
-            >
-              {item.label}
-            </Link>
-          ))}
+        {/* Navigation */}
+        <nav className="hidden md:flex items-center gap-8">
+          {navigation.map((item) => {
+            if (item.children) {
+              return (
+                <NavDropdown
+                  key={item.label}
+                  label={item.label}
+                  items={item.children}
+                />
+              );
+            }
+
+            return (
+              <Link
+                key={item.label}
+                href={item.href!}
+                className="text-[15px] font-medium text-[#2B3234] transition-colors hover:text-[#003966]"
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
-        {/* Action Icons */}
-        <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="icon" className="hidden sm:flex">
+        {/* Right actions */}
+        <div className="flex items-center gap-6 text-[#2B3234]">
+          {/* Search */}
+          <button className="transition hover:text-[#003966]">
             <Search className="h-5 w-5" />
-          </Button>
+          </button>
 
-          {/* Account Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <User className="h-5 w-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              {isLoggedIn ? (
-                <>
-                  <DropdownMenuItem asChild><Link href="/profile">My Profile</Link></DropdownMenuItem>
-                  <DropdownMenuItem asChild><Link href="/orders">My Orders</Link></DropdownMenuItem>
-                  {isAdmin && (
-                    <DropdownMenuItem asChild className="text-primary font-bold">
-                      <Link href="/admin">Admin Panel</Link>
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem className="text-destructive">Logout</DropdownMenuItem>
-                </>
-              ) : (
-                <>
-                  <DropdownMenuItem asChild><Link href="/login">Login</Link></DropdownMenuItem>
-                  <DropdownMenuItem asChild><Link href="/register">Register</Link></DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Auth */}
+          {isLoggedIn ? (
+            <div className="flex items-center gap-1">
+              <User className="h-5 w-5" />
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="text-[15px] font-medium text-[#2B3234] transition-colors hover:text-[#003966]"
+            >
+              შესვლა
+            </Link>
+          )}
 
-          {/* Basket */}
-          <Link href="/cart">
-            <Button variant="ghost" size="icon" className="relative">
-              <ShoppingCart className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground font-bold">
-                0
-              </span>
-            </Button>
-          </Link>
+          {/* Cart */}
+          <button className="relative transition hover:text-[#003966]">
+            <ShoppingCart className="h-5 w-5 text-[#2B3234]" />
+            <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] text-white">
+              2
+            </span>
+          </button>
         </div>
       </div>
     </header>
