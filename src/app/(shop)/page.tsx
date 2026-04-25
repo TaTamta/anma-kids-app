@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { productsService } from "@/services/products.service";
+import { Hero } from "@/components/home/hero";
 
 export default function Home() {
   useEffect(() => {
@@ -11,5 +12,9 @@ export default function Home() {
       .catch((err) => console.error("Error:", err.message));
   }, []);
 
-  return <div>test — check browser console</div>;
+  return (
+    <div className="flex flex-col w-full">
+      <Hero />
+    </div>
+  );
 }
