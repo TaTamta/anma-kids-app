@@ -1,5 +1,4 @@
 import axios, { AxiosError } from "axios";
-import Cookies from "js-cookie";
 import { tokenStorage } from "./auth-token";
 
 export const api = axios.create({
@@ -8,23 +7,10 @@ export const api = axios.create({
   timeout: 15000,
 });
 
+// Attach the auth token to every request.
+// Falls back to NEXT_PUBLIC_DEV_TOKEN so the API can be explored locally before login exists.
 api.interceptors.request.use((config) => {
   const token = tokenStorage.get() ?? process.env.NEXT_PUBLIC_DEV_TOKEN;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-api.interceptors.request.use((config) => {
-  const token = tokenStorage.get();
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
-
-// Attach token to EVERY request (your current requirement)
-api.interceptors.request.use((config) => {
-  const token = Cookies.get("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -36,7 +22,7 @@ api.interceptors.response.use(
   (response) => response,
   (error: AxiosError<{ message?: string }>) => {
     if (error.response?.status === 401) {
-      Cookies.remove("token");
+      tokenStorage.remove();
       if (
         typeof window !== "undefined" &&
         !window.location.pathname.startsWith("/login")
